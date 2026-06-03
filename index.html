@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יצירת כתוביות — clips.Scribe</title>
+  <meta name="description" content="תמלול שמע אוטומטי בעברית וסנכרון כתוביות SRT בממשק cR Studio.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Grid & Overlays -->
+  <div class="bg-container">
+    <div class="bg-overlay-dark"></div>
+    <div class="bg-overlay-grad"></div>
+    <div class="grid-drift-container grid-drift-animated" id="bg-grid">
+      <!-- 16 Grid images populated by app.js -->
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+      <div class="grid-image-wrapper"><img src="" alt=""></div>
+    </div>
+  </div>
+
+  <!-- Password Protection Overlay -->
+  <div class="login-overlay" id="login-overlay">
+    <div class="workspace-card" style="max-width: 420px; min-height: auto; gap: 1.5rem; text-align: center; align-items: center; padding: 2.5rem 2rem;">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+      <div class="preview-glow"></div>
+      
+      <div class="empty-icon-wrapper" style="color: var(--primary);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <div>
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">כניסה מאובטחת</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">אנא הזן סיסמה כדי להשתמש ב-clips.Scribe</p>
+      </div>
+      
+      <div style="width: 100%; z-index: 10;">
+        <input type="password" id="password-input" placeholder="הזן סיסמה..." class="password-field" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; padding: 0.8rem 1rem; border-radius: 10px; width: 100%; outline: none; transition: border-color 0.2s; font-family: var(--font-sans); text-align: center; font-size: 0.95rem;">
+        <div id="login-error" style="display: none; color: var(--error); font-size: 0.8rem; margin-top: 0.5rem; text-align: center;">סיסמה שגויה, אנא נסה שנית.</div>
+      </div>
+      
+      <button class="btn-transcribe" id="btn-login" style="padding: 0.9rem; display: flex; font-size: 0.9rem;">התחבר</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand" id="brand-link">
+      <img src="Clips%20Tag-modified.png" alt="clips.Revolution" class="brand-logo" id="logo-header">
+      <span class="brand-text">clips.<span>Scribe</span></span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main>
+    <!-- Page Intro -->
+    <div class="page-intro">
+      <h1>תמלול וסנכרון שמע</h1>
+      <p>הפוך קבצי שמע ווידאו לכתוביות SRT מוכנות בעברית באמצעות Whisper API</p>
+    </div>
+
+    <!-- Centered Workspace Card -->
+    <div class="workspace-card" id="workspace-card">
+      <!-- Geometric Corners -->
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+      <div class="preview-glow"></div>
+
+      <!-- State 1: Upload (Visible by default) -->
+      <div class="state-upload-container" id="state-upload">
+        <div>
+          <label class="form-label" for="file-input">בחר קובץ שמע או וידאו לטעינה</label>
+          
+          <!-- Dropzone -->
+          <div class="dropzone" id="upload-zone" tabindex="0" role="button" aria-label="אזור העלאת קבצים">
+            <div class="upload-icon-wrapper">
+              <svg viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="dropzone-text">
+              <h3>גרר והשלך קובץ שמע או וידאו כאן</h3>
+              <p>או לחץ לבחירת קובץ מהמחשב</p>
+            </div>
+            <div class="dropzone-subtext">תומך ב-MP3, WAV, M4A, MP4, WebM (עד 25MB)</div>
+            <input type="file" id="file-input" accept="audio/*,video/*" style="display: none;">
+          </div>
+
+          <!-- File details bar -->
+          <div class="file-info" id="file-info-bar">
+            <div class="file-details">
+              <div class="file-icon">
+                <svg viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+              </div>
+              <div class="file-meta">
+                <span class="file-name" id="selected-file-name">filename.mp3</span>
+                <span class="file-size" id="selected-file-size">0.0 MB</span>
+              </div>
+            </div>
+            <button class="btn-remove-file" id="btn-clear-file" title="הסר קובץ" aria-label="הסר קובץ">
+              <svg viewBox="0 0 24 24" stroke="currentColor">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Transcribe Action Button -->
+        <button class="btn-transcribe" id="btn-start-transcription">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>תמלל קובץ שמע</span>
+        </button>
+      </div>
+
+      <!-- State 2: Loading (Hidden by default) -->
+      <div class="state-loading-container" id="state-loading">
+        <svg class="loader-icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="15"></circle>
+        </svg>
+        <h4 id="progress-title">מייצר כתוביות...</h4>
+        <p id="progress-desc">שולח לשרת ה-Whisper API, נא לא לסגור את העמוד.</p>
+      </div>
+
+      <!-- State 3: Result (Hidden by default) -->
+      <div class="state-result-container" id="state-result">
+        <div class="result-header">
+          <div class="result-title">
+            <svg viewBox="0 0 24 24" stroke="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>קובץ ה-SRT מוכן</span>
+          </div>
+          <div class="result-actions">
+            <button class="btn-action-small" id="btn-copy-srt">העתק</button>
+            <button class="btn-action-small primary" id="btn-download-srt">הורד SRT</button>
+          </div>
+        </div>
+        
+        <pre class="srt-code-box" id="srt-preview" lang="he" dir="ltr"></pre>
+        
+        <button class="btn-reset" id="btn-transcribe-another">תמלל קובץ נוסף</button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast-notification">
+    <span id="toast-message">הועתק בהצלחה!</span>
+  </div>
+
+
+
+  <script src="app.js"></script>
+</body>
+</html>

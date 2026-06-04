@@ -1,3 +1,26 @@
+/* ── Hamburger Menu ── */
+const hamburger   = document.getElementById('hamburger');
+const mobileMenu  = document.getElementById('mobile-menu');
+const mobileClose = document.getElementById('mobile-close');
+const backdrop    = document.getElementById('mobile-menu-backdrop');
+
+function openMobileMenu() {
+  mobileMenu.classList.add('open');
+  backdrop.classList.add('open');
+  hamburger.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+  mobileMenu.classList.remove('open');
+  backdrop.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+hamburger.addEventListener('click', openMobileMenu);
+mobileClose.addEventListener('click', closeMobileMenu);
+backdrop.addEventListener('click', closeMobileMenu);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
+
 document.addEventListener('DOMContentLoaded', () => {
   
   // 1. Background Grid Images Rotation (recreating BackgroundGrid.tsx client logic)

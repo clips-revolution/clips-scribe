@@ -191,6 +191,30 @@ body {
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a:hover { color: var(--foreground); }
 
+.mobile-menu-branded {
+  display: flex !important;
+  align-items: center;
+  gap: 0.65rem;
+}
+.mobile-menu-svg-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-menu-svg-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+.mobile-icon-home {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  box-shadow: 0 2px 10px rgba(168,85,247,0.4);
+}
+
 /* Header */
 header {
   position: relative;

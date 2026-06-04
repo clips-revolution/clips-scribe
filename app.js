@@ -1,3 +1,6 @@
+/* ── Reset horizontal scroll on load (iOS RTL fix) ── */
+window.addEventListener('load', () => { window.scrollTo(0, 0); });
+
 /* ── Hamburger Menu ── */
 const hamburger   = document.getElementById('hamburger');
 const mobileMenu  = document.getElementById('mobile-menu');

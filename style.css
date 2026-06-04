@@ -775,9 +775,9 @@ footer {
 /* Responsive adjustments */
 @media (max-width: 600px) {
   main {
-    flex: none;
-    justify-content: flex-start;
-    padding: 1rem 1rem 2rem;
+    flex: 1;
+    justify-content: center;
+    padding: 4.5rem 1.5rem 2rem;
   }
   .page-intro {
     margin-bottom: 0.75rem;

@@ -774,6 +774,10 @@ footer {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  /* Prevent iOS Safari zoom on input focus (requires font-size >= 16px) */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
   main {
     flex: 1;
     justify-content: center;

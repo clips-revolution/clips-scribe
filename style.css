@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Abraham';
+  src: url('Abraham-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --background: #0a0a0a;
@@ -11,7 +17,7 @@
   --text-muted: rgba(255, 255, 255, 0.4);
   --success: #10b981;
   --error: #ef4444;
-  --font-sans: 'Rubik', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Abraham', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'Courier New', Courier, monospace;
 }
 

@@ -765,14 +765,20 @@ footer {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  main {
+    padding: 1rem 1rem;
+  }
+  .page-intro {
+    margin-bottom: 1rem;
+  }
   .page-intro h1 {
     font-size: 1.75rem;
   }
   .workspace-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   .dropzone {
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
   }
   .file-name {
     max-width: 180px;

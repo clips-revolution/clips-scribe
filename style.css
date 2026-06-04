@@ -253,11 +253,11 @@ header {
 }
 
 .brand-logo {
-  height: 40px;
-  width: 40px;
+  height: 38px;
+  width: 38px;
   object-fit: contain;
   border-radius: 50%;
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
 }
 
 .brand-text {

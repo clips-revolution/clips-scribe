@@ -866,3 +866,10 @@ footer {
   box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
 }
 
+/* Hide website contents when password screen is active */
+body.not-logged-in main,
+body.not-logged-in header,
+body.not-logged-in footer {
+  display: none !important;
+}
+

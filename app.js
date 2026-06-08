@@ -130,6 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedPassword = sessionStorage.getItem('app_password');
   if (savedPassword) {
     loginOverlay.classList.add('hidden');
+    document.body.classList.remove('not-logged-in');
+  } else {
+    document.body.classList.add('not-logged-in');
   }
 
   // Handle login submit
@@ -152,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         sessionStorage.setItem('app_password', password);
         loginOverlay.classList.add('hidden');
+        document.body.classList.remove('not-logged-in');
         passwordInput.value = '';
       } else {
         loginError.style.display = 'block';
@@ -180,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showLoginOverlay(withError = false) {
     sessionStorage.removeItem('app_password');
     loginOverlay.classList.remove('hidden');
+    document.body.classList.add('not-logged-in');
     if (withError) {
       loginError.style.display = 'block';
       loginError.textContent = 'פג תוקף החיבור, אנא הזן סיסמה שנית.';

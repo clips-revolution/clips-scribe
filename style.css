@@ -844,9 +844,9 @@ footer {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background-color: rgba(5, 2, 8, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background-color: rgba(5, 2, 8, 0.55); /* Reduced opacity */
+  backdrop-filter: blur(10px);          /* Reduced blur to let grid show through */
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;

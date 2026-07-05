@@ -272,10 +272,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Whisper size limit check (25MB)
-    const maxSize = 25 * 1024 * 1024;
+    // Whisper size limit check (adjusted to Vercel's 4.5MB limit)
+    const maxSize = 4.5 * 1024 * 1024;
     if (file.size > maxSize) {
-      showToast('גודל הקובץ עולה על 25MB. אנא בחר קובץ קטן יותר.', true);
+      showToast('גודל הקובץ עולה על 4.5MB. (מגבלת שרת)', true);
       return;
     }
 
@@ -325,13 +325,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const password = sessionStorage.getItem('app_password') || '';
+      const wordsPerLine = document.getElementById('words-per-line') ? document.getElementById('words-per-line').value : 'Auto';
+      
       // Send the file content as binary in the request body
       // We pass the MIME type in Content-Type header so the server knows the format
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         headers: {
           'Content-Type': selectedFile.type || 'audio/mpeg',
-          'X-App-Password': password
+          'X-App-Password': password,
+          'X-Words-Per-Line': wordsPerLine
         },
         body: selectedFile
       });

@@ -84,19 +84,38 @@ export default async function handler(req, res) {
     // 4. Convert the buffer to a File object for the OpenAI SDK
     const file = await toFile(buffer, filename);
 
+    // Extract wordsPerLine from headers
+    const wordsPerLineStr = req.headers['x-words-per-line'];
+    const wordsPerLine = wordsPerLineStr && wordsPerLineStr !== 'Auto' ? parseInt(wordsPerLineStr, 10) : null;
+
+    let finalSrt = '';
+
     // 5. Send to OpenAI Whisper API
-    // We specify response_format as 'srt' and language as 'he' for Hebrew subtitles
-    const transcription = await openai.audio.transcriptions.create({
-      file: file,
-      model: 'whisper-1',
-      response_format: 'srt',
-      language: 'he',
-    });
+    if (wordsPerLine && !isNaN(wordsPerLine)) {
+      // If words per line is requested, we need word-level timestamps
+      const transcription = await openai.audio.transcriptions.create({
+        file: file,
+        model: 'whisper-1',
+        response_format: 'verbose_json',
+        timestamp_granularities: ['word'],
+        language: 'he',
+      });
+      
+      finalSrt = generateCustomSrt(transcription.words, wordsPerLine);
+    } else {
+      // Default auto format (OpenAI's standard SRT)
+      finalSrt = await openai.audio.transcriptions.create({
+        file: file,
+        model: 'whisper-1',
+        response_format: 'srt',
+        language: 'he',
+      });
+    }
 
     // 6. Return the ready SRT content
     res.setHeader('Content-Type', 'text/srt; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="transcription.srt"');
-    res.status(200).send(transcription);
+    res.status(200).send(finalSrt);
 
   } catch (error) {
     console.error('Error during transcription:', error);
@@ -105,4 +124,36 @@ export default async function handler(req, res) {
       details: error.message || String(error),
     });
   }
+}
+
+// --- Helper Functions for Custom SRT Generation ---
+
+function formatSrtTime(seconds) {
+  const date = new Date(seconds * 1000);
+  const hh = String(date.getUTCHours()).padStart(2, '0');
+  const mm = String(date.getUTCMinutes()).padStart(2, '0');
+  const ss = String(date.getUTCSeconds()).padStart(2, '0');
+  const ms = String(date.getUTCMilliseconds()).padStart(3, '0');
+  return `${hh}:${mm}:${ss},${ms}`;
+}
+
+function generateCustomSrt(words, wordsPerLine) {
+  if (!words || words.length === 0) return '';
+  
+  let srt = '';
+  let index = 1;
+  
+  for (let i = 0; i < words.length; i += wordsPerLine) {
+    const chunk = words.slice(i, i + wordsPerLine);
+    const start = formatSrtTime(chunk[0].start);
+    const end = formatSrtTime(chunk[chunk.length - 1].end);
+    
+    // Some words from OpenAI come with leading/trailing spaces
+    const text = chunk.map(w => w.word.trim()).join(' ');
+    
+    srt += `${index}\n${start} --> ${end}\n${text}\n\n`;
+    index++;
+  }
+  
+  return srt.trim();
 }

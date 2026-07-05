@@ -163,16 +163,26 @@
           </div>
         </div>
 
-        <div class="settings-bar" style="margin-top: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
-          <label for="words-per-line" style="color: var(--text-muted); font-size: 0.95rem; font-weight: bold;">מספר מילים בשורה:</label>
-          <select id="words-per-line" style="background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; outline: none; cursor: pointer; font-family: inherit; font-size: 0.9rem;">
-            <option value="Auto" style="background: #111;">אוטומטי (OpenAI)</option>
-            <option value="1" style="background: #111;">1 מילה (קצבי)</option>
-            <option value="2" selected style="background: #111;">2 מילים (מומלץ לרילס)</option>
-            <option value="3" style="background: #111;">3 מילים (לרילס/טיקטוק)</option>
-            <option value="5" style="background: #111;">5 מילים</option>
-            <option value="7" style="background: #111;">7 מילים (לסרטי רוחב)</option>
-          </select>
+        <div class="settings-bar" style="margin-top: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="language-select" style="color: var(--text-muted); font-size: 0.95rem; font-weight: bold;">שפת הסרטון:</label>
+            <select id="language-select" style="background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; outline: none; cursor: pointer; font-family: inherit; font-size: 0.9rem;">
+              <option value="he" selected style="background: #111;">עברית</option>
+              <option value="en" style="background: #111;">אנגלית</option>
+              <option value="Auto" style="background: #111;">זיהוי אוטומטי</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="words-per-line" style="color: var(--text-muted); font-size: 0.95rem; font-weight: bold;">מספר מילים בשורה:</label>
+            <select id="words-per-line" style="background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; outline: none; cursor: pointer; font-family: inherit; font-size: 0.9rem;">
+              <option value="Auto" style="background: #111;">אוטומטי (OpenAI)</option>
+              <option value="1" style="background: #111;">1 מילה (קצבי)</option>
+              <option value="2" selected style="background: #111;">2 מילים (מומלץ לרילס)</option>
+              <option value="3" style="background: #111;">3 מילים (לרילס/טיקטוק)</option>
+              <option value="5" style="background: #111;">5 מילים</option>
+              <option value="7" style="background: #111;">7 מילים (לסרטי רוחב)</option>
+            </select>
+          </div>
         </div>
 
         <!-- Transcribe Action Button -->

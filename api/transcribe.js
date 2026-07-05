@@ -84,32 +84,36 @@ export default async function handler(req, res) {
     // 4. Convert the buffer to a File object for the OpenAI SDK
     const file = await toFile(buffer, filename);
 
-    // Extract wordsPerLine from headers
+    // Extract wordsPerLine and audioLanguage from headers
     const wordsPerLineStr = req.headers['x-words-per-line'];
     const wordsPerLine = wordsPerLineStr && wordsPerLineStr !== 'Auto' ? parseInt(wordsPerLineStr, 10) : null;
+    
+    const audioLanguageStr = req.headers['x-audio-language'];
+    const audioLanguage = audioLanguageStr && audioLanguageStr !== 'Auto' ? audioLanguageStr : null;
 
     let finalSrt = '';
+    
+    // Base options for OpenAI
+    const requestOptions = {
+      file: file,
+      model: 'whisper-1'
+    };
+    if (audioLanguage) {
+      requestOptions.language = audioLanguage;
+    }
 
     // 5. Send to OpenAI Whisper API
     if (wordsPerLine && !isNaN(wordsPerLine)) {
       // If words per line is requested, we need word-level timestamps
-      const transcription = await openai.audio.transcriptions.create({
-        file: file,
-        model: 'whisper-1',
-        response_format: 'verbose_json',
-        timestamp_granularities: ['word'],
-        language: 'he',
-      });
+      requestOptions.response_format = 'verbose_json';
+      requestOptions.timestamp_granularities = ['word'];
       
+      const transcription = await openai.audio.transcriptions.create(requestOptions);
       finalSrt = generateCustomSrt(transcription.words, wordsPerLine);
     } else {
       // Default auto format (OpenAI's standard SRT)
-      finalSrt = await openai.audio.transcriptions.create({
-        file: file,
-        model: 'whisper-1',
-        response_format: 'srt',
-        language: 'he',
-      });
+      requestOptions.response_format = 'srt';
+      finalSrt = await openai.audio.transcriptions.create(requestOptions);
     }
 
     // 6. Return the ready SRT content

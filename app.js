@@ -397,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const password = sessionStorage.getItem('app_password') || '';
       const wordsPerLine = document.getElementById('words-per-line') ? document.getElementById('words-per-line').value : 'Auto';
+      const audioLanguage = document.getElementById('language-select') ? document.getElementById('language-select').value : 'he';
       
       // Send the file content as binary in the request body
       // We pass the MIME type in Content-Type header so the server knows the format
@@ -405,7 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: {
           'Content-Type': fileToSend.type || 'audio/mpeg',
           'X-App-Password': password,
-          'X-Words-Per-Line': wordsPerLine
+          'X-Words-Per-Line': wordsPerLine,
+          'X-Audio-Language': audioLanguage
         },
         body: fileToSend
       });

@@ -272,10 +272,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Whisper size limit check (adjusted to Vercel's 4.5MB limit)
-    const maxSize = 4.5 * 1024 * 1024;
+    // Size limit check (250MB - will be compressed locally if > 4MB)
+    const maxSize = 250 * 1024 * 1024;
     if (file.size > maxSize) {
-      showToast('גודל הקובץ עולה על 4.5MB. (מגבלת שרת)', true);
+      showToast('גודל הקובץ עולה על 250MB.', true);
       return;
     }
 
@@ -314,6 +314,60 @@ document.addEventListener('DOMContentLoaded', () => {
     srtContent = '';
   }
 
+  // Helper for compressing audio with Web Audio API + lamejs
+  async function compressAudioToMp3(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async function(ev) {
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const decodedAudio = await audioContext.decodeAudioData(ev.target.result);
+          
+          // We want 1 channel, 22050 Hz (good enough for speech, saves space)
+          const offlineCtx = new OfflineAudioContext(1, decodedAudio.duration * 22050, 22050);
+          const source = offlineCtx.createBufferSource();
+          source.buffer = decodedAudio;
+          source.connect(offlineCtx.destination);
+          source.start();
+          
+          const renderedBuffer = await offlineCtx.startRendering();
+          const channelData = renderedBuffer.getChannelData(0); // Float32Array
+          
+          // Convert Float32 to Int16
+          const samples = new Int16Array(channelData.length);
+          for (let i = 0; i < channelData.length; i++) {
+            let s = Math.max(-1, Math.min(1, channelData[i]));
+            samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+          }
+          
+          // Encode using lamejs (1 channel, 22050Hz, 64kbps)
+          const mp3encoder = new lamejs.Mp3Encoder(1, 22050, 64);
+          const mp3Data = [];
+          
+          const sampleBlockSize = 1152;
+          for (let i = 0; i < samples.length; i += sampleBlockSize) {
+            const sampleChunk = samples.subarray(i, i + sampleBlockSize);
+            const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
+            if (mp3buf.length > 0) {
+              mp3Data.push(mp3buf);
+            }
+          }
+          const mp3buf = mp3encoder.flush();
+          if (mp3buf.length > 0) {
+            mp3Data.push(new Int8Array(mp3buf));
+          }
+          
+          const blob = new Blob(mp3Data, { type: 'audio/mp3' });
+          resolve(new File([blob], file.name + '_compressed.mp3', { type: 'audio/mp3' }));
+        } catch(err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
   // Start Transcription Request
   btnStartTranscription.addEventListener('click', async () => {
     if (!selectedFile) return;
@@ -322,8 +376,25 @@ document.addEventListener('DOMContentLoaded', () => {
     stateUpload.style.display = 'none';
     stateLoading.style.display = 'flex';
     stateResult.style.display = 'none';
+    
+    const progressTitle = document.getElementById('progress-title');
+    const progressDesc = document.getElementById('progress-desc');
 
     try {
+      let fileToSend = selectedFile;
+      
+      // If file is > 4MB, compress it to avoid Vercel 4.5MB limit
+      const VERCEL_LIMIT = 4 * 1024 * 1024;
+      if (selectedFile.size > VERCEL_LIMIT) {
+         progressTitle.textContent = 'מכווץ את הקובץ...';
+         progressDesc.textContent = 'הקובץ גדול, אנו דוחסים אותו במכשיר שלך (ללא פגיעה בתמלול) כדי לעקוף את מגבלת הרשת.';
+         
+         fileToSend = await compressAudioToMp3(selectedFile);
+      }
+      
+      progressTitle.textContent = 'מייצר כתוביות...';
+      progressDesc.textContent = 'שולח לשרת ה-Whisper API, נא לא לסגור את העמוד.';
+
       const password = sessionStorage.getItem('app_password') || '';
       const wordsPerLine = document.getElementById('words-per-line') ? document.getElementById('words-per-line').value : 'Auto';
       
@@ -332,11 +403,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         headers: {
-          'Content-Type': selectedFile.type || 'audio/mpeg',
+          'Content-Type': fileToSend.type || 'audio/mpeg',
           'X-App-Password': password,
           'X-Words-Per-Line': wordsPerLine
         },
-        body: selectedFile
+        body: fileToSend
       });
 
       if (!response.ok) {

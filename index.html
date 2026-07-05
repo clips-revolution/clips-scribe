@@ -135,7 +135,7 @@
               <h3>גרור והשלך קובץ שמע או וידאו כאן</h3>
               <p>או לחץ לבחירת קובץ מהמחשב</p>
             </div>
-            <div class="dropzone-subtext">תומך ב-MP3, WAV, M4A, MP4, WebM (עד 4.5MB)</div>
+            <div class="dropzone-subtext">תומך ב-MP3, WAV, M4A, MP4, WebM (עד 250MB - עם דחיסה אוטומטית)</div>
             <input type="file" id="file-input" accept="audio/*,video/*" style="display: none;">
           </div>
 
@@ -230,8 +230,7 @@
     <span id="toast-message">הועתק בהצלחה!</span>
   </div>
 
-
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

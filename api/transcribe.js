@@ -146,40 +146,15 @@ function generateCustomSrt(words, wordsPerLine) {
   
   let srt = '';
   let index = 1;
-  let currentChunk = [];
   
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
+  for (let i = 0; i < words.length; i += wordsPerLine) {
+    const chunk = words.slice(i, i + wordsPerLine);
+    const start = formatSrtTime(chunk[0].start);
+    const end = formatSrtTime(chunk[chunk.length - 1].end);
     
-    if (currentChunk.length > 0) {
-      const prevWord = currentChunk[currentChunk.length - 1];
-      // If there's a pause of more than 1 second, force a break so lyrics don't stay on screen during instrumental breaks
-      if (word.start - prevWord.end > 1.0) {
-        const start = formatSrtTime(currentChunk[0].start);
-        const end = formatSrtTime(prevWord.end);
-        const text = currentChunk.map(w => w.word.trim()).join(' ');
-        srt += `${index}\n${start} --> ${end}\n${text}\n\n`;
-        index++;
-        currentChunk = [];
-      }
-    }
+    // Some words from OpenAI come with leading/trailing spaces
+    const text = chunk.map(w => w.word.trim()).join(' ');
     
-    currentChunk.push(word);
-    
-    if (currentChunk.length === wordsPerLine) {
-      const start = formatSrtTime(currentChunk[0].start);
-      const end = formatSrtTime(currentChunk[currentChunk.length - 1].end);
-      const text = currentChunk.map(w => w.word.trim()).join(' ');
-      srt += `${index}\n${start} --> ${end}\n${text}\n\n`;
-      index++;
-      currentChunk = [];
-    }
-  }
-  
-  if (currentChunk.length > 0) {
-    const start = formatSrtTime(currentChunk[0].start);
-    const end = formatSrtTime(currentChunk[currentChunk.length - 1].end);
-    const text = currentChunk.map(w => w.word.trim()).join(' ');
     srt += `${index}\n${start} --> ${end}\n${text}\n\n`;
     index++;
   }

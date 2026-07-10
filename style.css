@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
 @font-face {
   font-family: 'Abraham';
   src: url('Abraham-Regular.ttf') format('truetype');
@@ -12,12 +14,15 @@
   --card: #121212;
   --primary: #a855f7;
   --primary-hover: #c084fc;
+  --primary-dark: #7c3aed;
   --border: #222222;
+  --border-subtle: rgba(255,255,255,0.08);
   --border-focus: rgba(255, 255, 255, 0.2);
   --text-muted: rgba(255, 255, 255, 0.4);
+  --text-muted-2: rgba(255, 255, 255, 0.25);
   --success: #10b981;
   --error: #ef4444;
-  --font-sans: 'Abraham', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Outfit', 'Abraham', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'Courier New', Courier, monospace;
 }
 
